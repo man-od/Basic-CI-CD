@@ -1,0 +1,67 @@
+stages:
+  - build
+  - style
+  - test
+  - deploy
+
+part-build:
+  stage: build
+  tags:
+    - build
+  script:
+    - cd src/cat
+    - make
+    - cd ../grep
+    - make
+  artifacts:
+    paths:
+      - src/cat/s21_cat
+      - src/grep/s21_grep
+    expire_in: 30 days
+  after_script:
+    - cd src && bash telegram.sh
+
+part-style:
+  stage: style
+  tags:
+    - style
+  script:
+    - cd src/cat
+    - clang-format --Werror -n *.c
+    - clang-format --Werror -n *.h
+    - cd ../grep
+    - clang-format --Werror -n *.c
+    - clang-format --Werror -n *.h
+  rules:
+    - allow_failure: false
+  after_script:
+    - cd src && bash telegram.sh
+    
+part-test:
+  stage: test
+  tags:
+    - test
+  script:
+    - cd src/cat
+    - make
+    - make tests
+    - cd ../grep
+    - make
+    - make tests
+  rules:
+    - allow_failure: false
+  after_script:
+    - cd src && bash telegram.sh
+
+part-deploy:
+  stage: deploy
+  tags:
+    - deploy
+  script:
+    - cd src
+    - scp cat/s21_cat armorcoo@192.168.100.10:/usr/local/bin
+    - scp grep/s21_grep armorcoo@192.168.100.10:/usr/local/bin
+    - ssh armorcoo@192.168.100.10 ls -lah /usr/local/bin
+  when: manual
+  after_script:
+    - cd src && bash telegram.sh
