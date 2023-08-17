@@ -1,0 +1,56 @@
+CI/CD
+
+Установка runnerа
+====================
+sudo apt install gitlab-runner
+sudo curl -L --output /usr/local/bin/gitlab-runner "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64"
+sudo chmod +x /usr/local/bin/gitlab-runner
+sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+sudo gitlab-runner start/restart
+sudo systemctl enable gitlab-runner —now
+sudo gitlab-runner register
+
+Проверка runner’s
+====================
+gitlab-runner verify
+gitlab-runner list
+vim /etc/gitlab-runner/config.toml
+
+Удаление gitlab-runner 
+====================
+ps -ax | grep gitlab-runner
+[pid]?  ssl  0:06 /usr/bin/gitlab-runner run --working-directory /home/gitlab-runner --config /etc/gitlab-runner/config.toml --service gitlab-runner --syslog --user gitlab-runner
+sudo kill [pid]
+
+gitlab-runner restart
+
+sudo gitlab-runner uninstall
+sudo rm -rf /usr/local/bin/gitlab-runner
+sudo userdel gitlab-runner
+sudo rm -rf /home/gitlab-runner/
+sudo gitlab-runner unregister --all-runners
+
+
+CD (DEPLOY PART)
+====================
+sudo apt install openssh-server
+sudo su - gitlab-runner
+ssh-keygen -t rsa -b 2048
+ssh-copy-id @[p_address] (ip and username of the 2nd machine)
+give all the rights on the 2nd machines's folder where we copy our artifacts:
+sudo chmod -R u+rw /usr/local/bin/
+
+Sudo su
+Ssh-keygen
+Cat /root/.ssh/id_rsa
+ssh-copy-id @[p_address] (ip and username of the 2nd machine)
+
+
+Telegram BOT
+====================
+curl -s -d
+curl: Это утилита командной строки для передачи данных через различные протоколы, включая HTTP
+-s: Этот флаг, сокращение от "silent" (тихий), указывает curl не выводить информацию о ходе выполнения запроса. Включение этого флага делает выполнение команды без вывода лишней информации
+-d: Этот флаг, сокращение от "data" (данные), используется для указания данных, которые будут отправлены на сервер в теле запроса. 
+> /dev/null в Linux — это файл нулевого устройства. Это удалит все записанное в него и вернет EOF при чтении
